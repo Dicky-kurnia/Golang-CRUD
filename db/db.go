@@ -2,6 +2,7 @@ package db
 
 
 import (
+	"github.com/tutorials/go/crud/models"
     "log"
 
 
@@ -10,7 +11,7 @@ import (
 )
 
 func Init() *gorm.DB {
-    dbURL := "postgres://postgres:postgres@localhost:5432/crud"
+    dbURL := "postgres://postgres:postgres@localhost:5432"
 
     db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 
@@ -18,7 +19,7 @@ func Init() *gorm.DB {
         log.Fatalln(err)
     }
 
-    db.AutoMigrate(&models.Book)
+    db.AutoMigrate(&models.Book{})
 
     return db
 }

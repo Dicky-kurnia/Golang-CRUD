@@ -3,16 +3,16 @@ package handler
 import (
 	"net/http"
 	"io/ioutil"
-	"github.com/tutorials/go/crud/mocks"
 	"encoding/json"
 	"github.com/tutorials/go/crud/models"
 	"log"
 	"strconv"
 	"github.com/gorilla/mux"
+	"fmt"
 	
 )
 
-func UpdateBook(w http.ResponseWriter, r *http.Request){
+func (h handler) UpdateBook(w http.ResponseWriter, r *http.Request){
 
 	vars := mux.Vars(r)
 	Id, _ := strconv.Atoi(vars["id"])
@@ -27,16 +27,18 @@ func UpdateBook(w http.ResponseWriter, r *http.Request){
 	var updateBook models.Book
 	json.Unmarshal(body, &updateBook)
 
-	for index, book := range mocks.Books {
-		if book.Id == Id {
-			book.Name = updateBook.Name
-			book.IsActive = updateBook.IsActive
+	var book models.Book
 
-			mocks.Books[index] = book
-
-			w.WriteHeader(http.StatusOK)
-			w.Header().Add("Content-Type", "applicaction/json")
-			json.NewEncoder(w).Encode("Updated")
-		}
+	if result := h.DB.First(&book, Id);result.Error != nil {
+		fmt.Println(result.Error)
 	}
+
+	book.Name = updateBook.Name
+	book.IsActive = updateBook.IsActive
+
+	h.DB.Save(&book)
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Add("Content-Type", "applicaction/json")
+	json.NewEncoder(w).Encode("Updated")
 }
